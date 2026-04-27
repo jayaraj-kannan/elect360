@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-tn-crimson: #D2042D;
+  --color-tn-gold: #FFB800;
+  --color-kl-white: #FFFDD0;
+  --color-kl-green: #006400;
+  --color-ka-red: #FF0000;
+  --color-ka-yellow: #FFFF00;
+  --color-ap-saffron: #FF9933;
+  --color-ap-teal: #008080;
+
+  --font-sans: "Inter", "Outfit", sans-serif;
+  
+  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 20px var(--brand-primary-alpha);
+}
+
+:root {
+  --brand-primary: #D2042D;
+  --brand-secondary: #FFB800;
+  --brand-primary-alpha: rgba(210, 4, 45, 0.4);
+  --background: #ffffff;
+  --foreground: #171717;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.1);
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --glass-bg: rgba(20, 20, 20, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+@layer utilities {
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+  }
+  
+  .text-glow {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+  
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradientMove 5s ease infinite;
+  }
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-tn {
+  background: linear-gradient(135deg, #D2042D 0%, #FFB800 100%);
+}
+
+.gradient-kl {
+  background: linear-gradient(135deg, #006400 0%, #FFFDD0 100%);
+}
+
+.gradient-ka {
+  background: linear-gradient(135deg, #FF0000 0%, #FFFF00 100%);
+}
