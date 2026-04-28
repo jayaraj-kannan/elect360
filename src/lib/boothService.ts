@@ -74,7 +74,9 @@ export async function getDistrictsByState(stateId: string) {
   if (stateId === "TN") {
     try {
       const districts = await getUniqueDistricts();
-      return districts.map(d => ({ id: d, name: d }));
+      if (districts.length > 0) {
+        return districts.map(d => ({ id: d, name: d }));
+      }
     } catch (err) {
       console.error("Failed to fetch districts for TN:", err);
     }

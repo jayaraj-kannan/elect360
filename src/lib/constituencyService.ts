@@ -25,6 +25,13 @@ const ELECTION_ROOT = "tn_election_2026";
 let cachedConstituencies: FirestoreConstituency[] | null = null;
 
 /**
+ * Resets the internal cache (mainly for testing).
+ */
+export function resetCache() {
+  cachedConstituencies = null;
+}
+
+/**
  * Fetches all constituencies from Firestore and caches them.
  */
 export async function getAllConstituencies(): Promise<FirestoreConstituency[]> {

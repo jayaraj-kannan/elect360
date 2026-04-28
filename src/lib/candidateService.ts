@@ -54,7 +54,7 @@ export async function getCandidatesByConstituencyName(constituencyName: string):
       candidates.push({
         id: doc.id,
         name: data.name || doc.id,
-        party: data.party || "Independent",
+        party: data.party === "IND" || !data.party ? "Independent" : data.party,
         constituencyId: realConstituencyId,
         education: data.education || "N/A",
         wealth: data.total_assets || "N/A", // Map from external schema
