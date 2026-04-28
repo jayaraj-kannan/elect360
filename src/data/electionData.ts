@@ -11,6 +11,8 @@ export interface Ward {
   id: string;
   name: string;
   stateId: string;
+  constituencyId?: string;
+  constituencyName?: string;
   booth: Booth;
 }
 

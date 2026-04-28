@@ -1,10 +1,8 @@
-import { db } from "./firebase";
 import { 
-  collection, 
-  query, 
-  where, 
-  getDocs, 
-} from "firebase/firestore";
+  getUniqueDistricts, 
+  getConstituenciesByDistrictName,
+  getAllConstituencies
+} from "./constituencyService";
 import { electionData } from "../data/electionData";
 
 export interface BoothData {
@@ -58,19 +56,12 @@ const getMockBooths = (): BoothData[] => {
 
 export async function getAllStates() {
   try {
-    const boothsRef = collection(db, BOOTHS_COLLECTION);
-    const snapshot = await getDocs(boothsRef);
-    const states = new Map<string, string>();
-    
-    snapshot.forEach(doc => {
-      const data = doc.data() as BoothData;
-      if (data.stateId) {
-        states.set(data.stateId, data.stateName);
-      }
-    });
-    
-    if (states.size === 0) throw new Error("Empty Firestore");
-    return Array.from(states.entries()).map(([id, name]) => ({ id, name }));
+    // For now, we prioritize TN as per the requirement
+    const constituencies = await getAllConstituencies();
+    if (constituencies.length > 0) {
+      return [{ id: "TN", name: "Tamil Nadu" }];
+    }
+    throw new Error("No constituencies found in Firestore");
   } catch (err) {
     console.warn("Firestore failed, using mock data", err);
     const states = new Map<string, string>();
@@ -80,50 +71,46 @@ export async function getAllStates() {
 }
 
 export async function getDistrictsByState(stateId: string) {
-  try {
-    const boothsRef = collection(db, BOOTHS_COLLECTION);
-    const q = query(boothsRef, where("stateId", "==", stateId));
-    const snapshot = await getDocs(q);
-    const districts = new Map<string, string>();
-    
-    snapshot.forEach(doc => {
-      const data = doc.data() as BoothData;
-      districts.set(data.districtId, data.districtName);
-    });
-    
-    if (districts.size === 0) throw new Error("Empty Firestore");
-    return Array.from(districts.entries()).map(([id, name]) => ({ id, name }));
-  } catch (err) {
-    const state = electionData.find(s => s.id === stateId);
-    return state ? state.districts.map(d => ({ id: d.id, name: d.name })) : [];
+  if (stateId === "TN") {
+    try {
+      const districts = await getUniqueDistricts();
+      return districts.map(d => ({ id: d, name: d }));
+    } catch (err) {
+      console.error("Failed to fetch districts for TN:", err);
+    }
   }
+  
+  const state = electionData.find(s => s.id === stateId);
+  return state ? state.districts.map(d => ({ id: d.id, name: d.name })) : [];
 }
 
 export async function getConstituenciesByDistrict(districtId: string) {
+  // If districtId is a name (from Firestore) or matches TN districts
   try {
-    const boothsRef = collection(db, BOOTHS_COLLECTION);
-    const q = query(boothsRef, where("districtId", "==", districtId));
-    const snapshot = await getDocs(q);
-    const constituencies = new Map<string, string>();
-    
-    snapshot.forEach(doc => {
-      const data = doc.data() as BoothData;
-      constituencies.set(data.constituencyId, data.constituencyName);
-    });
-    
-    if (constituencies.size === 0) throw new Error("Empty Firestore");
-    return Array.from(constituencies.entries()).map(([id, name]) => ({ id, name }));
-  } catch (err) {
-    for (const state of electionData) {
-      const district = state.districts.find(d => d.id === districtId);
-      if (district) return district.constituencies.map(c => ({ id: c.id, name: c.name }));
+    const constituencies = await getConstituenciesByDistrictName(districtId);
+    if (constituencies.length > 0) {
+      return constituencies.map(c => ({ 
+        id: c.id, // Using the document ID (e.g., 001_gummidipoondi)
+        name: c.name 
+      }));
     }
-    return [];
+  } catch (err) {
+    console.error("Failed to fetch constituencies from Firestore:", err);
   }
+
+  // Fallback to mock data
+  for (const state of electionData) {
+    const district = state.districts.find(d => d.id === districtId);
+    if (district) return district.constituencies.map(c => ({ id: c.id, name: c.name }));
+  }
+  return [];
 }
 
 export async function getWardsByConstituency(constituencyId: string) {
   try {
+    const { db } = await import("./firebase");
+    const { collection, query, where, getDocs } = await import("firebase/firestore");
+    
     const boothsRef = collection(db, BOOTHS_COLLECTION);
     const q = query(boothsRef, where("constituencyId", "==", constituencyId));
     const snapshot = await getDocs(q);
@@ -134,9 +121,10 @@ export async function getWardsByConstituency(constituencyId: string) {
       wards.set(data.wardId, data);
     });
     
-    if (wards.size === 0) throw new Error("Empty Firestore");
+    if (wards.size === 0) throw new Error("No booths found for constituency " + constituencyId);
     return Array.from(wards.values());
   } catch (err) {
+    console.warn("Wards fetch failed, falling back to mock:", err);
     const booths = getMockBooths();
     return booths.filter(b => b.constituencyId === constituencyId);
   }
@@ -144,6 +132,9 @@ export async function getWardsByConstituency(constituencyId: string) {
 
 export async function searchBooths(searchTerm: string) {
   try {
+    const { db } = await import("./firebase");
+    const { collection, getDocs } = await import("firebase/firestore");
+    
     const boothsRef = collection(db, BOOTHS_COLLECTION);
     const snapshot = await getDocs(boothsRef);
     const booths: BoothData[] = [];
@@ -160,9 +151,10 @@ export async function searchBooths(searchTerm: string) {
       }
     });
     
-    if (booths.length === 0 && searchTerm === "") throw new Error("Empty Firestore");
+    if (booths.length === 0 && searchTerm === "") throw new Error("No booths found in Firestore");
     return booths;
   } catch (err) {
+    console.warn("Booth search failed, falling back to mock:", err);
     const booths = getMockBooths();
     if (!searchTerm) return booths;
     const lowerSearch = searchTerm.toLowerCase();

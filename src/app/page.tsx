@@ -112,7 +112,10 @@ export default function Home() {
           <VoterChecklist />
 
           {/* Candidate Section */}
-          <CandidateShowcase />
+          <CandidateShowcase 
+            constituencyId={selectedBooth?.constituencyId} 
+            constituencyName={selectedBooth?.constituencyName} 
+          />
 
           {/* Quick Action Tabs */}
           <section className="max-w-7xl mx-auto w-full px-4 overflow-hidden">

@@ -138,6 +138,8 @@ export default function BoothSearchForm({ onSelect }: BoothSearchFormProps) {
         id: boothData.wardId,
         name: boothData.wardName,
         stateId: boothData.stateId,
+        constituencyId: boothData.constituencyId,
+        constituencyName: boothData.constituencyName,
         booth: {
           id: boothData.id,
           name: boothData.name,
