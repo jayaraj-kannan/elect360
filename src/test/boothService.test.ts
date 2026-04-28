@@ -18,121 +18,225 @@ describe('boothService', () => {
     vi.clearAllMocks();
   });
 
-  it('should fallback to mock data when firestore fails', async () => {
-    (constituencyService.getAllConstituencies as any).mockRejectedValue(new Error('Firestore error'));
-    (constituencyService.getUniqueDistricts as any).mockRejectedValue(new Error('Firestore error'));
-    (constituencyService.getConstituenciesByDistrictName as any).mockRejectedValue(new Error('Firestore error'));
-    (firestore.getDocs as any).mockRejectedValue(new Error('Firestore error'));
-    
+  // ── getAllStates ──────────────────────────────────────────────
+  it('should return TN when Firestore has constituencies', async () => {
+    (constituencyService.getAllConstituencies as any).mockResolvedValue([
+      { id: 'c1', name: 'Const 1', district: 'D1' }
+    ]);
+
+    const states = await getAllStates();
+    expect(states).toEqual([{ id: 'TN', name: 'Tamil Nadu' }]);
+  });
+
+  it('should fallback to mock data when Firestore returns empty constituencies', async () => {
+    (constituencyService.getAllConstituencies as any).mockResolvedValue([]);
+
     const states = await getAllStates();
     expect(states).toHaveLength(electionData.length);
-    
+  });
+
+  it('should fallback to mock data when Firestore throws', async () => {
+    (constituencyService.getAllConstituencies as any).mockRejectedValue(new Error('Firestore error'));
+
+    const states = await getAllStates();
+    expect(states).toHaveLength(electionData.length);
+  });
+
+  // ── getDistrictsByState ──────────────────────────────────────
+  it('should return Firestore districts for TN', async () => {
+    (constituencyService.getUniqueDistricts as any).mockResolvedValue(['Chennai', 'Coimbatore']);
+
+    const districts = await getDistrictsByState('TN');
+    expect(districts).toEqual([
+      { id: 'Chennai', name: 'Chennai' },
+      { id: 'Coimbatore', name: 'Coimbatore' }
+    ]);
+  });
+
+  it('should fallback to mock districts when Firestore returns empty for TN', async () => {
+    (constituencyService.getUniqueDistricts as any).mockResolvedValue([]);
+
+    const districts = await getDistrictsByState('TN');
+    // Falls through to mock data for TN
+    expect(districts.length).toBeGreaterThan(0);
+  });
+
+  it('should fallback to mock districts when Firestore throws for TN', async () => {
+    (constituencyService.getUniqueDistricts as any).mockRejectedValue(new Error('Firestore error'));
+
     const districts = await getDistrictsByState('TN');
     expect(districts.length).toBeGreaterThan(0);
+  });
+
+  it('should return mock districts for non-TN states', async () => {
+    const districts = await getDistrictsByState('KA');
+    // Uses mock data directly — no Firestore call
+    expect(constituencyService.getUniqueDistricts).not.toHaveBeenCalled();
+  });
+
+  it('should return empty for unknown state', async () => {
+    const districts = await getDistrictsByState('NON_EXISTENT');
+    expect(districts).toHaveLength(0);
+  });
+
+  // ── getConstituenciesByDistrict ──────────────────────────────
+  it('should return Firestore constituencies when available', async () => {
+    (constituencyService.getConstituenciesByDistrictName as any).mockResolvedValue([
+      { id: 'c1', name: 'Const 1' },
+      { id: 'c2', name: 'Const 2' }
+    ]);
+
+    const constituencies = await getConstituenciesByDistrict('Chennai');
+    expect(constituencies).toEqual([
+      { id: 'c1', name: 'Const 1' },
+      { id: 'c2', name: 'Const 2' }
+    ]);
+  });
+
+  it('should fallback to mock when Firestore returns empty constituencies', async () => {
+    (constituencyService.getConstituenciesByDistrictName as any).mockResolvedValue([]);
 
     const constituencies = await getConstituenciesByDistrict('chennai');
     expect(constituencies.length).toBeGreaterThan(0);
+  });
+
+  it('should fallback to mock when Firestore throws for constituencies', async () => {
+    (constituencyService.getConstituenciesByDistrictName as any).mockRejectedValue(new Error('Firestore error'));
+
+    const constituencies = await getConstituenciesByDistrict('chennai');
+    expect(constituencies.length).toBeGreaterThan(0);
+  });
+
+  it('should return empty for unknown district in fallback', async () => {
+    (constituencyService.getConstituenciesByDistrictName as any).mockResolvedValue([]);
+
+    const constituencies = await getConstituenciesByDistrict('NON_EXISTENT');
+    expect(constituencies).toHaveLength(0);
+  });
+
+  // ── getWardsByConstituency ───────────────────────────────────
+  it('should return wards from Firestore when booths exist', async () => {
+    const mockBoothData = {
+      wardId: 'w1', wardName: 'Ward 1',
+      id: 'b1', name: 'Booth 1', address: 'Addr', coords: { lat: 0, lng: 0 },
+      stateId: 'TN', stateName: 'Tamil Nadu',
+      districtId: 'd1', districtName: 'D1',
+      constituencyId: 'c1', constituencyName: 'C1'
+    };
+
+    (firestore.getDocs as any).mockResolvedValue({
+      forEach: (cb: any) => cb({ data: () => mockBoothData }),
+      size: 1
+    });
+
+    const wards = await getWardsByConstituency('c1');
+    expect(wards).toHaveLength(1);
+    expect(wards[0].wardName).toBe('Ward 1');
+  });
+
+  it('should fallback to mock when no booths in Firestore', async () => {
+    (firestore.getDocs as any).mockResolvedValue({
+      forEach: vi.fn(),
+      size: 0
+    });
 
     const wards = await getWardsByConstituency('mylapore');
     expect(wards.length).toBeGreaterThan(0);
   });
 
-  it('should return empty arrays when fallback state/district not found', async () => {
+  it('should fallback to mock when Firestore throws for wards', async () => {
     (firestore.getDocs as any).mockRejectedValue(new Error('Firestore error'));
-    expect(await getDistrictsByState('NON_EXISTENT')).toHaveLength(0);
-    expect(await getConstituenciesByDistrict('NON_EXISTENT')).toHaveLength(0);
+
+    const wards = await getWardsByConstituency('mylapore');
+    expect(wards.length).toBeGreaterThan(0);
   });
 
-  it('should return data from firestore when successful', async () => {
-    (constituencyService.getAllConstituencies as any).mockResolvedValue([{ id: 'c1', name: 'Const 1', district: 'District 1' }]);
-    (constituencyService.getUniqueDistricts as any).mockResolvedValue(['District 1']);
-    (constituencyService.getConstituenciesByDistrictName as any).mockResolvedValue([{ id: 'c1', name: 'Const 1' }]);
-
-    const mockBoothData = [
-      { 
-        stateId: 'TN', stateName: 'Tamil Nadu', 
-        districtId: 'District 1', districtName: 'District 1',
-        constituencyId: 'c1', constituencyName: 'Const 1',
-        wardId: 'w1', wardName: 'Ward 1',
-        id: 'b1', name: 'Booth 1', address: 'Addr 1', coords: { lat: 0, lng: 0 }
-      }
-    ];
-    
-    (firestore.getDocs as any).mockResolvedValue({
-      forEach: (callback: any) => mockBoothData.forEach(item => callback({ data: () => item })),
-      size: 1
-    });
-    
-    expect((await getAllStates())[0].id).toBe('TN');
-    expect((await getDistrictsByState('TN'))[0].name).toBe('District 1');
-    expect((await getConstituenciesByDistrict('District 1'))[0].name).toBe('Const 1');
-    expect((await getWardsByConstituency('c1'))[0].wardName).toBe('Ward 1');
-    expect((await searchBooths('Booth 1'))[0].name).toBe('Booth 1');
-  });
-
-  it('should handle empty firestore snapshots in all functions', async () => {
-    (constituencyService.getAllConstituencies as any).mockResolvedValue([]);
-    (constituencyService.getUniqueDistricts as any).mockResolvedValue([]);
-    (constituencyService.getConstituenciesByDistrictName as any).mockResolvedValue([]);
-    (firestore.getDocs as any).mockResolvedValue({ forEach: vi.fn(), size: 0 });
-
-    expect((await getAllStates()).length).toBeGreaterThan(0);
-    expect((await getDistrictsByState('TN')).length).toBeGreaterThan(0);
-    expect((await getConstituenciesByDistrict('chennai')).length).toBeGreaterThan(0);
-    expect((await getWardsByConstituency('shanti-nagar')).length).toBeGreaterThan(0);
-    expect((await searchBooths('')).length).toBeGreaterThan(0);
-    
-    (firestore.getDocs as any).mockResolvedValue({
-      forEach: (cb: any) => cb({ data: () => ({ name: 'Non Matching' }) }),
-      size: 1
-    });
-    expect(await searchBooths('XYZ_NO_MATCH')).toHaveLength(0);
-  });
-
-  it('should match all search criteria in firestore search', async () => {
+  // ── searchBooths ─────────────────────────────────────────────
+  it('should search booths in Firestore by name', async () => {
     (firestore.getDocs as any).mockResolvedValue({
       forEach: (cb: any) => {
-        cb({ data: () => ({ name: 'N1', address: 'Matching Addr', wardName: 'W1' }) });
-        cb({ data: () => ({ name: 'N2', address: 'A2', wardName: 'Matching Ward' }) });
+        cb({ data: () => ({ name: 'Matching Booth', address: 'A1', wardName: 'W1' }) });
+        cb({ data: () => ({ name: 'Other Booth', address: 'A2', wardName: 'W2' }) });
       },
       size: 2
     });
-    expect(await searchBooths('Matching Addr')).toHaveLength(1);
-    expect(await searchBooths('Matching Ward')).toHaveLength(1);
+
+    const results = await searchBooths('Matching');
+    expect(results).toHaveLength(1);
+    expect(results[0].name).toBe('Matching Booth');
   });
 
-  it('should handle data missing stateId', async () => {
-    (constituencyService.getAllConstituencies as any).mockResolvedValue([]);
+  it('should search booths in Firestore by address', async () => {
+    (firestore.getDocs as any).mockResolvedValue({
+      forEach: (cb: any) => {
+        cb({ data: () => ({ name: 'N1', address: 'Matching Address', wardName: 'W1' }) });
+      },
+      size: 1
+    });
+
+    const results = await searchBooths('Matching Address');
+    expect(results).toHaveLength(1);
+  });
+
+  it('should search booths in Firestore by wardName', async () => {
+    (firestore.getDocs as any).mockResolvedValue({
+      forEach: (cb: any) => {
+        cb({ data: () => ({ name: 'N1', address: 'A1', wardName: 'Matching Ward' }) });
+      },
+      size: 1
+    });
+
+    const results = await searchBooths('Matching Ward');
+    expect(results).toHaveLength(1);
+  });
+
+  it('should return non-matching Firestore results without fallback', async () => {
+    (firestore.getDocs as any).mockResolvedValue({
+      forEach: (cb: any) => {
+        cb({ data: () => ({ name: 'Booth A', address: 'Addr A', wardName: 'Ward A' }) });
+      },
+      size: 1
+    });
+
+    const results = await searchBooths('XYZ_NO_MATCH');
+    expect(results).toHaveLength(0);
+  });
+
+  it('should fallback to mock when Firestore empty and search is empty string', async () => {
+    (firestore.getDocs as any).mockResolvedValue({
+      forEach: vi.fn(),
+      size: 0
+    });
+
+    const results = await searchBooths('');
+    expect(results.length).toBeGreaterThan(0); // Falls back to all mock booths
+  });
+
+  it('should fallback to mock search when Firestore throws', async () => {
+    (firestore.getDocs as any).mockRejectedValue(new Error('Firestore error'));
+
+    // Empty search returns all mock booths
+    expect((await searchBooths('')).length).toBeGreaterThan(0);
+
+    // Name match in mock data
+    expect((await searchBooths('Govt Higher'))[0].name).toContain('Govt Higher');
+
+    // Address match in mock data
+    expect((await searchBooths('West Mada'))[0].address).toContain('West Mada');
+
+    // No match returns empty
+    expect(await searchBooths('XYZ_NO_MATCH')).toHaveLength(0);
+  });
+
+  it('should handle Firestore data with missing fields gracefully', async () => {
     (firestore.getDocs as any).mockResolvedValue({
       forEach: (cb: any) => cb({ data: () => ({ name: 'Incomplete' }) }),
       size: 1
     });
-    expect((await getAllStates()).length).toBeGreaterThan(0);
-  });
 
-  it('should filter booths in fallback search', async () => {
-    (firestore.getDocs as any).mockRejectedValue(new Error('Firestore error'));
-    
-    // Search by name
-    expect((await searchBooths('Govt Higher'))[0].name).toContain('Govt Higher');
-    
-    // Search by address
-    expect((await searchBooths('West Mada'))[0].address).toContain('West Mada');
-    
-    // Empty search
-    expect((await searchBooths('')).length).toBeGreaterThan(0);
-    
-    // No match
-    expect(await searchBooths('XYZ_NO_MATCH')).toHaveLength(0);
-  });
-
-  it('should handle Firestore success with name match', async () => {
-    (firestore.getDocs as any).mockResolvedValue({
-      forEach: (cb: any) => cb({ data: () => ({ name: 'Matching Name', address: 'A', wardName: 'W' }) }),
-      size: 1
-    });
-    const results = await searchBooths('Matching Name');
+    // searchBooths with empty string — data exists but no match for empty throws fallback
+    // The data has name but will match empty string (includes empty)
+    const results = await searchBooths('Incomplete');
     expect(results).toHaveLength(1);
-    expect(results[0].name).toBe('Matching Name');
   });
 });

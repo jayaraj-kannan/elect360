@@ -17,7 +17,7 @@ interface BoothSearchFormProps {
 }
 
 export default function BoothSearchForm({ onSelect }: BoothSearchFormProps) {
-  const [stateId, setStateId] = useState("");
+  const [stateId, setStateId] = useState("TN"); // Default to Tamil Nadu
   const [districtId, setDistrictId] = useState("");
   const [constituencyId, setConstituencyId] = useState("");
   const [wardId, setWardId] = useState("");
@@ -40,6 +40,9 @@ export default function BoothSearchForm({ onSelect }: BoothSearchFormProps) {
       try {
         const data = await getAllStates();
         setStates(data);
+        
+        // If TN is in the list, it's already set as default stateId
+        // but we need to trigger district load if not already happening
       } catch (err) {
         console.error("Failed to load states", err);
       } finally {
@@ -181,53 +184,60 @@ export default function BoothSearchForm({ onSelect }: BoothSearchFormProps) {
           </div>
         </div>
 
-        {/* District */}
-        <div className={`space-y-2 transition-opacity ${!stateId ? 'opacity-20 pointer-events-none' : 'opacity-100'}`}>
-          <label htmlFor="district-select" className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">District</label>
-          <div className="relative group">
-            <select 
-              id="district-select"
-              value={districtId} 
-              onChange={handleDistrictChange}
-              disabled={loading.districts}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 pr-12 appearance-none font-bold text-sm focus:outline-none focus:border-brand-primary transition-colors group-hover:bg-white/10 disabled:opacity-50"
-            >
-              <option value="" className="bg-black">{loading.districts ? "Loading..." : "Select District"}</option>
-              {districts.map(d => <option key={d.id} value={d.id} className="bg-black">{d.name}</option>)}
-            </select>
-            {loading.districts ? (
-              <Loader2 size={18} className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-brand-primary" />
-            ) : (
-              <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 opacity-40 group-hover:opacity-100 transition-opacity" />
+        {/* District Selection - Interactive Grid */}
+        <div className={`space-y-3 transition-all duration-500 ${!stateId ? 'opacity-20 pointer-events-none' : 'opacity-100'}`}>
+          <div className="flex justify-between items-end ml-1">
+            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest">Select District</label>
+            {loading.districts && <Loader2 size={12} className="animate-spin text-brand-primary mb-1" />}
+          </div>
+          
+          <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto pr-2 custom-scrollbar">
+            {districts.map(d => (
+              <button
+                key={d.id}
+                onClick={() => handleDistrictChange({ target: { value: d.id } } as any)}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                  districtId === d.id 
+                    ? 'bg-brand-primary border-brand-primary text-white shadow-glow' 
+                    : 'bg-white/5 border-white/10 text-white/60 hover:border-white/20'
+                }`}
+              >
+                {d.name}
+              </button>
+            ))}
+            {districts.length === 0 && !loading.districts && (
+              <p className="text-[10px] opacity-40 italic py-2">Select a state first...</p>
             )}
           </div>
         </div>
 
-        {/* Constituency */}
-        <div className={`space-y-2 transition-opacity ${!districtId ? 'opacity-20 pointer-events-none' : 'opacity-100'}`}>
-          <label htmlFor="constituency-select" className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Constituency</label>
-          <div className="relative group">
-            <select 
-              id="constituency-select"
-              value={constituencyId} 
-              onChange={handleConstituencyChange}
-              disabled={loading.constituencies}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 pr-12 appearance-none font-bold text-sm focus:outline-none focus:border-brand-primary transition-colors group-hover:bg-white/10 disabled:opacity-50"
-            >
-              <option value="" className="bg-black">{loading.constituencies ? "Loading..." : "Select Constituency"}</option>
-              {constituencies.map(c => <option key={c.id} value={c.id} className="bg-black">{c.name}</option>)}
-            </select>
-            {loading.constituencies ? (
-              <Loader2 size={18} className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-brand-primary" />
-            ) : (
-              <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 opacity-40 group-hover:opacity-100 transition-opacity" />
-            )}
+        {/* Constituency Selection - interactive Grid */}
+        <div className={`space-y-3 transition-all duration-500 ${!districtId ? 'opacity-20 pointer-events-none translate-y-2' : 'opacity-100 translate-y-0'}`}>
+          <div className="flex justify-between items-end ml-1">
+            <label className="text-[10px] font-black opacity-40 uppercase tracking-widest">Constituency</label>
+            {loading.constituencies && <Loader2 size={12} className="animate-spin text-brand-primary mb-1" />}
+          </div>
+          
+          <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+            {constituencies.map(c => (
+              <button
+                key={c.id}
+                onClick={() => handleConstituencyChange({ target: { value: c.id } } as any)}
+                className={`px-4 py-2 rounded-xl text-[11px] font-bold transition-all border ${
+                  constituencyId === c.id 
+                    ? 'bg-white border-white text-black shadow-premium' 
+                    : 'bg-white/5 border-white/10 text-white/60 hover:border-white/20'
+                }`}
+              >
+                {c.name}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Ward */}
-        <div className={`space-y-2 transition-opacity ${!constituencyId ? 'opacity-20 pointer-events-none' : 'opacity-100'}`}>
-          <label htmlFor="ward-select" className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Ward / Booth Area</label>
+        {/* Ward Selection - Keep as dropdown for precision */}
+        <div className={`space-y-2 transition-all duration-500 ${!constituencyId ? 'opacity-20 pointer-events-none translate-y-2' : 'opacity-100 translate-y-0'}`}>
+          <label htmlFor="ward-select" className="text-[10px] font-black opacity-40 uppercase tracking-widest ml-1">Polling Station / Ward</label>
           <div className="relative group">
             <select 
               id="ward-select"
@@ -236,7 +246,7 @@ export default function BoothSearchForm({ onSelect }: BoothSearchFormProps) {
               disabled={loading.wards}
               className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 pr-12 appearance-none font-bold text-sm focus:outline-none focus:border-brand-primary transition-colors group-hover:bg-white/10 disabled:opacity-50"
             >
-              <option value="" className="bg-black">{loading.wards ? "Loading..." : "Select Ward"}</option>
+              <option value="" className="bg-black">{loading.wards ? "Searching Booths..." : "Choose your Booth area"}</option>
               {wards.map(w => <option key={w.wardId} value={w.wardId} className="bg-black">{w.wardName}</option>)}
             </select>
             {loading.wards ? (

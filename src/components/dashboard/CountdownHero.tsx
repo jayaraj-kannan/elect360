@@ -6,9 +6,11 @@ import { motion } from 'framer-motion';
 
 interface CountdownHeroProps {
   stateName: string;
+  onGetReady?: () => void;
+  onSeeCandidates?: () => void;
 }
 
-export default function CountdownHero({ stateName }: CountdownHeroProps) {
+export default function CountdownHero({ stateName, onGetReady, onSeeCandidates }: CountdownHeroProps) {
   const [timeLeft, setTimeLeft] = useState({ days: 2, hours: 14, minutes: 22, seconds: 54 });
 
   useEffect(() => {
@@ -54,12 +56,18 @@ export default function CountdownHero({ stateName }: CountdownHeroProps) {
           </p>
 
           <div className="flex flex-wrap gap-4">
-            <button className="bg-brand-primary text-white px-8 py-4 rounded-2xl font-black text-lg shadow-glow hover:-translate-y-1 transition-all group">
+            <button 
+              onClick={onGetReady}
+              className="bg-brand-primary text-white px-8 py-4 rounded-2xl font-black text-lg shadow-glow hover:-translate-y-1 transition-all group"
+            >
               <span className="flex items-center gap-3">
                 GET READY <ArrowRight className="group-hover:translate-x-2 transition-transform" />
               </span>
             </button>
-            <button className="glass px-8 py-4 rounded-2xl font-black text-lg hover:bg-white/10 transition-all">
+            <button 
+              onClick={onSeeCandidates}
+              className="glass px-8 py-4 rounded-2xl font-black text-lg hover:bg-white/10 transition-all"
+            >
               SEE CANDIDATES
             </button>
           </div>

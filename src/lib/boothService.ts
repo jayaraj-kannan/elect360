@@ -114,8 +114,10 @@ export async function getWardsByConstituency(constituencyId: string) {
     const { collection, query, where, getDocs } = await import("firebase/firestore");
     
     const boothsRef = collection(db, BOOTHS_COLLECTION);
+    console.log(`Fetching booths for constituency: ${constituencyId} from collection: ${BOOTHS_COLLECTION}`);
     const q = query(boothsRef, where("constituencyId", "==", constituencyId));
     const snapshot = await getDocs(q);
+    console.log(`Found ${snapshot.size} booths in Firestore.`);
     const wards = new Map<string, BoothData>();
     
     snapshot.forEach(doc => {

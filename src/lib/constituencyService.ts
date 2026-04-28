@@ -38,15 +38,22 @@ export async function getAllConstituencies(): Promise<FirestoreConstituency[]> {
   if (cachedConstituencies) return cachedConstituencies;
 
   try {
-    const colRef = collection(db, ELECTION_ROOT, "constituencies", "all");
-    const snapshot = await getDocs(colRef);
+    console.log(`Fetching constituencies from: ${ELECTION_ROOT}/constituencies/all`);
+    const constRef = collection(db, ELECTION_ROOT, "constituencies", "all");
+    const snapshot = await getDocs(constRef);
     
-    cachedConstituencies = snapshot.docs.map(doc => ({
+    if (snapshot.empty) {
+      console.warn("Firestore collection is empty at the specified path.");
+    }
+
+    const data = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    } as FirestoreConstituency));
-
-    return cachedConstituencies;
+    })) as FirestoreConstituency[];
+    
+    console.log(`Successfully fetched ${data.length} constituencies.`);
+    cachedConstituencies = data;
+    return data;
   } catch (err) {
     console.error("Failed to fetch constituencies from Firestore:", err);
     return [];

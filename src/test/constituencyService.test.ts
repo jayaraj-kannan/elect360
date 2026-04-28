@@ -23,6 +23,7 @@ describe('constituencyService', () => {
     ];
 
     (firestore.getDocs as any).mockResolvedValue({
+      empty: false,
       docs: mockDocs.map(doc => ({
         id: doc.id,
         data: () => doc
@@ -33,16 +34,51 @@ describe('constituencyService', () => {
     expect(results).toHaveLength(2);
     expect(results[0].id).toBe('001_g');
     expect(results[0].name).toBe('Gummidipoondi');
+    expect(results[1].district).toBe('Thiruvallur');
+  });
+
+  it('should return cached data on second call', async () => {
+    const mockDocs = [
+      { id: '001_g', name: 'Gummidipoondi', district: 'Thiruvallur', constituency_no: 1 }
+    ];
+
+    (firestore.getDocs as any).mockResolvedValue({
+      empty: false,
+      docs: mockDocs.map(doc => ({
+        id: doc.id,
+        data: () => doc
+      }))
+    });
+
+    const first = await getAllConstituencies();
+    const second = await getAllConstituencies();
+    expect(first).toBe(second); // Same reference — cached
+    expect(firestore.getDocs).toHaveBeenCalledTimes(1); // Only one Firestore call
+  });
+
+  it('should warn when Firestore collection is empty', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    (firestore.getDocs as any).mockResolvedValue({
+      empty: true,
+      docs: []
+    });
+
+    const results = await getAllConstituencies();
+    expect(results).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith('Firestore collection is empty at the specified path.');
+    warnSpy.mockRestore();
   });
 
   it('should return unique districts sorted alphabetically', async () => {
     const mockDocs = [
-      { id: '1', district: 'Chennai' },
-      { id: '2', district: 'Thiruvallur' },
-      { id: '3', district: 'Chennai' }
+      { id: '1', district: 'Chennai', constituency_no: 1 },
+      { id: '2', district: 'Thiruvallur', constituency_no: 2 },
+      { id: '3', district: 'Chennai', constituency_no: 3 }
     ];
 
     (firestore.getDocs as any).mockResolvedValue({
+      empty: false,
       docs: mockDocs.map(doc => ({
         id: doc.id,
         data: () => doc
@@ -61,6 +97,7 @@ describe('constituencyService', () => {
     ];
 
     (firestore.getDocs as any).mockResolvedValue({
+      empty: false,
       docs: mockDocs.map(doc => ({
         id: doc.id,
         data: () => doc
@@ -73,13 +110,31 @@ describe('constituencyService', () => {
     expect(results[1].constituency_no).toBe(2);
   });
 
-  it('should find a constituency by ID or name', async () => {
+  it('should return empty array for unknown district', async () => {
+    const mockDocs = [
+      { id: '1', name: 'C1', district: 'D1', constituency_no: 1 }
+    ];
+
+    (firestore.getDocs as any).mockResolvedValue({
+      empty: false,
+      docs: mockDocs.map(doc => ({
+        id: doc.id,
+        data: () => doc
+      }))
+    });
+
+    const results = await getConstituenciesByDistrictName('UNKNOWN');
+    expect(results).toHaveLength(0);
+  });
+
+  it('should find a constituency by ID', async () => {
     const mockDocs = [
       { id: '001_g', name: 'Gummidipoondi' },
       { id: '002_p', name: 'Ponneri' }
     ];
 
     (firestore.getDocs as any).mockResolvedValue({
+      empty: false,
       docs: mockDocs.map(doc => ({
         id: doc.id,
         data: () => doc
@@ -88,22 +143,50 @@ describe('constituencyService', () => {
 
     const byId = await findConstituency('001_g');
     expect(byId?.name).toBe('Gummidipoondi');
+  });
 
-    const byName = await findConstituency('Ponneri');
+  it('should find a constituency by name (case-insensitive)', async () => {
+    const mockDocs = [
+      { id: '001_g', name: 'Gummidipoondi' },
+      { id: '002_p', name: 'Ponneri' }
+    ];
+
+    (firestore.getDocs as any).mockResolvedValue({
+      empty: false,
+      docs: mockDocs.map(doc => ({
+        id: doc.id,
+        data: () => doc
+      }))
+    });
+
+    const byName = await findConstituency('ponneri');
     expect(byName?.id).toBe('002_p');
+  });
+
+  it('should return undefined for non-existent constituency', async () => {
+    const mockDocs = [
+      { id: '001_g', name: 'Gummidipoondi' }
+    ];
+
+    (firestore.getDocs as any).mockResolvedValue({
+      empty: false,
+      docs: mockDocs.map(doc => ({
+        id: doc.id,
+        data: () => doc
+      }))
+    });
 
     const notFound = await findConstituency('Non Existent');
     expect(notFound).toBeUndefined();
   });
 
   it('should handle Firestore errors gracefully', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     (firestore.getDocs as any).mockRejectedValue(new Error('Firestore error'));
-    
-    // We need to bypass the cache for this test
-    // Since the cache is a module-level variable, we can't easily reset it without modifying the service
-    // But if we run this test first or after a failure, it should work.
     
     const results = await getAllConstituencies();
     expect(results).toEqual([]);
+    expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
   });
 });
