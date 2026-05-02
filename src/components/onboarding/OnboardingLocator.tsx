@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Locate, Search, ShieldCheck, Loader2, MapPin } from 'lucide-react';
-import { electionData, Ward } from '@/data/electionData';
+import { Ward } from '@/data/electionData';
 import BoothSearchForm from '../dashboard/BoothSearchForm';
 
 interface OnboardingLocatorProps {

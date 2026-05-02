@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  MapPin, Users, ArrowLeft, Home as HomeIcon, Loader2, ChevronRight 
+  MapPin, Users, ArrowLeft, Loader2, ChevronRight 
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import CountdownHero from "@/components/dashboard/CountdownHero";

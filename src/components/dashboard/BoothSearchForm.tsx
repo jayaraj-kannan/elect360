@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Ward } from '@/data/electionData';
-import { MapPin, ArrowRight, ChevronDown, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, ChevronDown, Loader2 } from 'lucide-react';
 import { 
   getAllStates,
   getDistrictsByState,
@@ -55,6 +54,7 @@ export default function BoothSearchForm({ onSelect }: BoothSearchFormProps) {
   // Load districts when state changes
   useEffect(() => {
     if (!stateId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDistricts([]);
       return;
     }
@@ -76,6 +76,7 @@ export default function BoothSearchForm({ onSelect }: BoothSearchFormProps) {
   // Load constituencies when district changes
   useEffect(() => {
     if (!districtId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setConstituencies([]);
       return;
     }
@@ -97,6 +98,7 @@ export default function BoothSearchForm({ onSelect }: BoothSearchFormProps) {
   // Load wards when constituency changes
   useEffect(() => {
     if (!constituencyId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWards([]);
       return;
     }
@@ -115,21 +117,21 @@ export default function BoothSearchForm({ onSelect }: BoothSearchFormProps) {
     loadWards();
   }, [constituencyId]);
 
+  const onDistrictSelect = (val: string) => {
+    setDistrictId(val);
+    setConstituencyId("");
+    setWardId("");
+  };
+
+  const onConstituencySelect = (val: string) => {
+    setConstituencyId(val);
+    setWardId("");
+  };
+
   const handleStateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setStateId(e.target.value);
     setDistrictId("");
     setConstituencyId("");
-    setWardId("");
-  };
-
-  const handleDistrictChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setDistrictId(e.target.value);
-    setConstituencyId("");
-    setWardId("");
-  };
-
-  const handleConstituencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setConstituencyId(e.target.value);
     setWardId("");
   };
 
@@ -195,7 +197,7 @@ export default function BoothSearchForm({ onSelect }: BoothSearchFormProps) {
             {districts.map(d => (
               <button
                 key={d.id}
-                onClick={() => handleDistrictChange({ target: { value: d.id } } as any)}
+                onClick={() => onDistrictSelect(d.id)}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
                   districtId === d.id 
                     ? 'bg-brand-primary border-brand-primary text-white shadow-glow' 
@@ -222,7 +224,7 @@ export default function BoothSearchForm({ onSelect }: BoothSearchFormProps) {
             {constituencies.map(c => (
               <button
                 key={c.id}
-                onClick={() => handleConstituencyChange({ target: { value: c.id } } as any)}
+                onClick={() => onConstituencySelect(c.id)}
                 className={`px-4 py-2 rounded-xl text-[11px] font-bold transition-all border ${
                   constituencyId === c.id 
                     ? 'bg-white border-white text-black shadow-premium' 

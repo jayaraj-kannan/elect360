@@ -39,6 +39,7 @@ export default function CandidateExplorer() {
   // Load constituencies when district changes
   useEffect(() => {
     if (!selectedDistrict) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setConstituencies([]);
       return;
     }
@@ -60,6 +61,7 @@ export default function CandidateExplorer() {
   // Load candidates when constituency changes
   useEffect(() => {
     if (!selectedConstituencyName) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCandidates([]);
       return;
     }

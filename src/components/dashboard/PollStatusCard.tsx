@@ -17,15 +17,15 @@ import CrowdReportModal from './CrowdReportModal';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
 
-export const getBarColor = (context: any) => {
-  const val = context.raw as number;
+export const getBarColor = (context: unknown) => {
+  const val = (context as { raw: number }).raw;
   if (val > 70) return '#D2042D';
   if (val > 40) return '#FFB800';
   return '#4ade80';
 };
 
-export const getTooltipLabel = (context: any) => {
-  const val = context.raw as number;
+export const getTooltipLabel = (context: unknown) => {
+  const val = (context as { raw: number }).raw;
   if (val > 70) return 'High';
   if (val > 40) return 'Moderate';
   return 'Low';

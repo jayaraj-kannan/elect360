@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { User, ShieldAlert, TrendingUp, FileText, ChevronRight, Loader2 } from 'lucide-react';
+import { ShieldAlert, TrendingUp, FileText, ChevronRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getCandidatesByConstituencyName, Candidate } from '@/lib/candidateService';
 
@@ -10,7 +10,7 @@ interface CandidateShowcaseProps {
   constituencyName?: string;
 }
 
-export default function CandidateShowcase({ constituencyId, constituencyName }: CandidateShowcaseProps) {
+export default function CandidateShowcase({ constituencyName }: CandidateShowcaseProps) {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(false);
 

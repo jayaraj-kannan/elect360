@@ -6,7 +6,7 @@ export interface FirestoreConstituency {
   constituency_no: number;
   district: string;
   election_date: string;
-  last_updated: any;
+  last_updated: unknown;
   margin: string | null;
   myneta_constituency_id: number;
   name: string;

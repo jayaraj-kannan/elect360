@@ -39,7 +39,7 @@ export default function IntroCard({ onComplete }: IntroCardProps) {
           <div className="space-y-6">
             <h2 className="text-2xl font-black uppercase tracking-tight">About the Platform</h2>
             <p className="text-sm md:text-base font-medium opacity-60 leading-relaxed">
-              enVote is South India's premium election assistant. We simplify democracy by providing real-time crowd data, location tracking, and deep candidate analytics in one secure, offline-capable PWA.
+              enVote is South India&apos;s premium election assistant. We simplify democracy by providing real-time crowd data, location tracking, and deep candidate analytics in one secure, offline-capable PWA.
             </p>
           </div>
 

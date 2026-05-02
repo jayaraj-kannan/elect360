@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { X, ShieldCheck, CreditCard, Fingerprint, Building2, FileText, Landmark, Heart, Briefcase, GraduationCap, BadgeCheck, Users, MapPin } from 'lucide-react';
+import { X, ShieldCheck, CreditCard, Fingerprint, Building2, FileText, Landmark, Heart, Briefcase, GraduationCap, BadgeCheck, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ValidDocumentsModalProps {

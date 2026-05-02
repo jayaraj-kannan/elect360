@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { MapPin, Navigation, ExternalLink, ShieldCheck, Locate, Search, ChevronLeft, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { electionData, Ward, Booth } from '@/data/electionData';
+import { electionData, Ward } from '@/data/electionData';
 import BoothSearchForm from './BoothSearchForm';
 
 type ViewState = 'initial' | 'search-options' | 'manual-form' | 'locating' | 'result';
@@ -24,7 +24,7 @@ export default function PollLocationCard() {
     }
 
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      (_pos) => {
         // Mocking the "nearest" booth based on actual GPS success
         // In a real app, this would hit a backend with lat/lng
         setTimeout(() => {
@@ -33,7 +33,7 @@ export default function PollLocationCard() {
           setView('result');
         }, 2000);
       },
-      (err) => {
+      (_err) => {
         setError("Location permission denied or unavailable");
         setView('search-options');
       }
