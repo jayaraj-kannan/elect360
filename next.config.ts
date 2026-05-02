@@ -8,6 +8,7 @@ const withSerwist = withSerwistInit({
 });
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   turbopack: {
     root: "/Users/jayarajkannan/Learnings/antigravity/elect360",
   },

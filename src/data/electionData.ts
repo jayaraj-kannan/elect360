@@ -11,6 +11,7 @@ export interface Ward {
   id: string;
   name: string;
   stateId: string;
+  districtId?: string;
   constituencyId?: string;
   constituencyName?: string;
   booth: Booth;
@@ -49,6 +50,9 @@ export const electionData: State[] = [
             wards: [
               {
                 id: "123",
+                stateId: "tn",
+                districtId: "chennai",
+                constituencyId: "mylapore",
                 name: "Ward 123 - Santhome",
                 booth: {
                   id: "b1",
@@ -61,6 +65,9 @@ export const electionData: State[] = [
               },
               {
                 id: "124",
+                stateId: "tn",
+                districtId: "chennai",
+                constituencyId: "mylapore",
                 name: "Ward 124 - Luz",
                 booth: {
                   id: "b2",
@@ -79,6 +86,9 @@ export const electionData: State[] = [
             wards: [
               {
                 id: "141",
+                stateId: "tn",
+                districtId: "chennai",
+                constituencyId: "t-nagar",
                 name: "Ward 141 - Pondy Bazaar",
                 booth: {
                   id: "b3",
@@ -103,6 +113,9 @@ export const electionData: State[] = [
             wards: [
               {
                 id: "1",
+                stateId: "tn",
+                districtId: "madurai",
+                constituencyId: "madurai-central",
                 name: "Ward 1 - Meenakshi Temple",
                 booth: {
                   id: "b4",
@@ -133,6 +146,9 @@ export const electionData: State[] = [
             wards: [
               {
                 id: "111",
+                stateId: "KA",
+                districtId: "bangalore",
+                constituencyId: "shanti-nagar",
                 name: "Ward 111 - Shantala Nagar",
                 booth: {
                   id: "b5",
@@ -151,6 +167,9 @@ export const electionData: State[] = [
             wards: [
               {
                 id: "80",
+                stateId: "KA",
+                districtId: "bangalore",
+                constituencyId: "indira-nagar",
                 name: "Ward 80 - Hoysala Nagar",
                 booth: {
                   id: "b6",
@@ -175,6 +194,9 @@ export const electionData: State[] = [
             wards: [
               {
                 id: "10",
+                stateId: "KA",
+                districtId: "mysore",
+                constituencyId: "kr-mohalla",
                 name: "Ward 10 - Palace Grounds",
                 booth: {
                   id: "b7",

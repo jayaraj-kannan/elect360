@@ -19,7 +19,6 @@ export default defineConfig({
         '**/*.d.ts',
         'src/**/index.ts',
       ],
-      all: true,
     },
   },
   resolve: {
