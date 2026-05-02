@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "db:seed": "tsx src/scripts/seedDatabase.ts"
   },
   "dependencies": {

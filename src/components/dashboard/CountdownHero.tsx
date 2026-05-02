@@ -17,8 +17,8 @@ export default function CountdownHero({ stateName, onGetReady, onSeeCandidates }
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
-        if (prev.minutes > 0) return { ...prev, minutes: 59, seconds: 59, hours: prev.hours - 1 };
-        // Simplified for demo
+        if (prev.minutes > 0) return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
+        if (prev.hours > 0) return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
         return prev;
       });
     }, 1000);
@@ -46,7 +46,7 @@ export default function CountdownHero({ stateName, onGetReady, onSeeCandidates }
           </div>
 
           <h1 className="text-4xl md:text-7xl font-black tracking-tighter leading-[1.1] mb-8">
-            {stateName}<br />
+            <span data-testid="state-name">{stateName}</span><br />
             <span className="text-brand-primary italic">ASSEMBLY </span> 
             VOTES
           </h1>

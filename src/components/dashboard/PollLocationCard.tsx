@@ -28,7 +28,7 @@ export default function PollLocationCard() {
         // Mocking the "nearest" booth based on actual GPS success
         // In a real app, this would hit a backend with lat/lng
         setTimeout(() => {
-          const mockWard = electionData[0].constituencies[0].wards[0];
+          const mockWard = electionData[0].districts[0].constituencies[0].wards[0];
           setSelectedWard(mockWard);
           setView('result');
         }, 2000);

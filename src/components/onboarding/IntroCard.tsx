@@ -28,7 +28,7 @@ export default function IntroCard({ onComplete }: IntroCardProps) {
             <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-md border border-white/20 shadow-xl">
                <Vote size={32} />
             </div>
-            <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-2">VOTEGUIDE 2026</h1>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-2">ENVOTE 2026</h1>
             <p className="text-xl font-bold opacity-80 italic">Your Voice, Digitally Empowered.</p>
           </div>
           {/* Decorative */}
@@ -39,7 +39,7 @@ export default function IntroCard({ onComplete }: IntroCardProps) {
           <div className="space-y-6">
             <h2 className="text-2xl font-black uppercase tracking-tight">About the Platform</h2>
             <p className="text-sm md:text-base font-medium opacity-60 leading-relaxed">
-              VoteGuide is South India's premium election assistant. We simplify democracy by providing real-time crowd data, location tracking, and deep candidate analytics in one secure, offline-capable PWA.
+              enVote is South India's premium election assistant. We simplify democracy by providing real-time crowd data, location tracking, and deep candidate analytics in one secure, offline-capable PWA.
             </p>
           </div>
 

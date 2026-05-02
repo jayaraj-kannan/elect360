@@ -44,7 +44,7 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] uppercase tracking-widest font-bold opacity-40">
-        <p>&copy; 2026 VoteGuide South India Team</p>
+        <p>&copy; 2026 enVote South India Team</p>
         <p>Built with ❤️ for a stronger democracy</p>
       </div>
     </footer>

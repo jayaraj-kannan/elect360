@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function Assistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: "Vanakkam! I'm Elee, your VoteGuide assistant. How can I help you prepare for the April 23 Tamil Nadu elections today?" }
+    { role: 'assistant', content: "Vanakkam! I'm Elee, your enVote assistant. How can I help you prepare for the April 23 Tamil Nadu elections today?" }
   ]);
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);

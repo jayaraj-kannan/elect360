@@ -50,7 +50,7 @@ export default function Navbar() {
           <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-2xl shadow-glow transform group-hover:scale-105 transition-all duration-500">
             <img 
               src="/logo.png" 
-              alt="VoteGuide Logo" 
+              alt="enVote Logo" 
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-brand-primary/10 group-hover:bg-transparent transition-colors" />
@@ -99,7 +99,11 @@ export default function Navbar() {
         {/* Mobile Toggle */}
         <div className="md:hidden flex items-center gap-2">
           <ThemeToggle />
-          <button className="text-foreground" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <button 
+            data-testid="mobile-menu-toggle"
+            className="text-foreground" 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
             {isMenuOpen ? <X /> : <Menu />}
           </button>
         </div>

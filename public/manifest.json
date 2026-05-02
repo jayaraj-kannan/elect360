@@ -1,6 +1,6 @@
 {
-  "name": "VoteGuide South India",
-  "short_name": "VoteGuide",
+  "name": "enVote South India",
+  "short_name": "enVote",
   "description": "Your interactive companion for the 2026 Elections.",
   "start_url": "/",
   "display": "standalone",

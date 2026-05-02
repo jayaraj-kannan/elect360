@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 const SYSTEM_PROMPT = `
-You are Elee, the official VoteGuide AI assistant for the 2026 South Indian Elections.
+You are Elee, the official enVote AI assistant for the 2026 South Indian Elections.
 Your goal is to help users in Tamil Nadu, Kerala, Pondicherry, Karnataka, and Andhra Pradesh understand the voting process.
 
 Key Knowledge:
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     const chat = model.startChat({
       history: [
         { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
-        { role: "model", parts: [{ text: "Understood. I am Elee, the VoteGuide AI assistant. How can I help you today?" }] },
+        { role: "model", parts: [{ text: "Understood. I am Elee, the enVote AI assistant. How can I help you today?" }] },
       ],
     });
 

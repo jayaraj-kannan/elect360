@@ -17,18 +17,27 @@ import CrowdReportModal from './CrowdReportModal';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
 
+export const getBarColor = (context: any) => {
+  const val = context.raw as number;
+  if (val > 70) return '#D2042D';
+  if (val > 40) return '#FFB800';
+  return '#4ade80';
+};
+
+export const getTooltipLabel = (context: any) => {
+  const val = context.raw as number;
+  if (val > 70) return 'High';
+  if (val > 40) return 'Moderate';
+  return 'Low';
+};
+
 const chartData = {
   labels: ['6am', '8am', '10am', '12pm', '2pm', '4pm', '6pm', '8pm'],
   datasets: [
     {
       label: 'Crowd Density',
       data: [15, 85, 45, 30, 20, 60, 95, 20],
-      backgroundColor: (context: any) => {
-        const val = context.raw as number;
-        if (val > 70) return '#D2042D';
-        if (val > 40) return '#FFB800';
-        return '#4ade80';
-      },
+      backgroundColor: getBarColor,
       borderRadius: 8,
     },
   ],
@@ -42,12 +51,7 @@ const chartOptions = {
     tooltip: {
       enabled: true,
       callbacks: {
-        label: (context: any) => {
-          const val = context.raw as number;
-          if (val > 70) return 'High';
-          if (val > 40) return 'Moderate';
-          return 'Low';
-        }
+        label: getTooltipLabel
       }
     }
   },

@@ -17,13 +17,13 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "VoteGuide | Your Interactive Election Assistant (South India 2026)",
+  title: "enVote | Your Interactive Election Assistant (South India 2026)",
   description: "Understand electoral processes, track crowd levels, and find your polling booth for the 2026 Assembly Elections in Tamil Nadu, Kerala, and beyond.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "VoteGuide",
+    title: "enVote",
   },
   keywords: ["Election 2026", "Tamil Nadu Election", "Kerala Election", "Voter Guide India", "Poll Crowd Tracking"],
 };
