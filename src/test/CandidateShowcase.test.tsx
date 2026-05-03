@@ -96,7 +96,7 @@ describe('CandidateShowcase', () => {
         image: '/test.jpg'
       }
     ];
-    vi.mocked(getCandidatesByConstituencyName).mockResolvedValueOnce(mockCandidates);
+    vi.mocked(getCandidatesByConstituencyName).mockResolvedValueOnce(mockCandidates as any);
 
     render(<CandidateShowcase constituencyName="Mylapore" />);
     

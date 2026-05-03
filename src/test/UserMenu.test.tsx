@@ -63,7 +63,7 @@ describe('UserMenu', () => {
     expect(avatar).toHaveAttribute('src', 'https://example.com/avatar.jpg');
 
     // Click to open dropdown
-    fireEvent.click(screen.getByRole('button', { name: /Jane Doe/i || /ChevronDown/i }));
+    fireEvent.click(screen.getByRole('button', { name: /User menu/i }));
     
     // Check dropdown content
     expect(screen.getByText('jane@example.com')).toBeInTheDocument();
@@ -91,7 +91,7 @@ describe('UserMenu', () => {
     render(<UserMenu />);
 
     // Open dropdown
-    fireEvent.click(screen.getByRole('button', { name: /Jane Doe/i || /ChevronDown/i }));
+    fireEvent.click(screen.getByRole('button', { name: /User menu/i }));
     expect(screen.getByText('jane@example.com')).toBeInTheDocument();
 
     // Click the backdrop (the fixed inset-0 div)

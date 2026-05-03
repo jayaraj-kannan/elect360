@@ -9,8 +9,10 @@ import CountdownHero from "@/components/dashboard/CountdownHero";
 import PollLocationCard from "@/components/dashboard/PollLocationCard";
 import CandidateExplorer from "@/components/dashboard/CandidateExplorer";
 import ValidDocumentsModal from "@/components/dashboard/ValidDocumentsModal";
+import VotingProcess from "@/components/dashboard/VotingProcess";
+import { BookOpen } from "lucide-react";
 
-type ViewState = 'home' | 'find-booth' | 'candidates';
+type ViewState = 'home' | 'find-booth' | 'candidates' | 'voting-process';
 
 export default function Home() {
   const [view, setView] = useState<ViewState>('home');
@@ -53,7 +55,7 @@ export default function Home() {
 
             {/* Quick Action Cards */}
             <section className="max-w-5xl mx-auto w-full px-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Find Your Booth Card */}
                 <motion.button
                   whileHover={{ y: -4, scale: 1.01 }}
@@ -89,6 +91,25 @@ export default function Home() {
                   <h3 className="text-xl font-black tracking-tight uppercase mb-2">See Candidates</h3>
                   <p className="text-sm opacity-50 leading-relaxed">
                     Explore candidates by district and constituency. View assets, cases, and profiles.
+                  </p>
+                </motion.button>
+
+                {/* How to Vote Card */}
+                <motion.button
+                  whileHover={{ y: -4, scale: 1.01 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setView('voting-process')}
+                  className="glass p-8 rounded-[32px] border-white/10 shadow-premium text-left group transition-all hover:border-blue-500/30"
+                >
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
+                      <BookOpen size={28} />
+                    </div>
+                    <ChevronRight size={20} className="opacity-20 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-blue-400" />
+                  </div>
+                  <h3 className="text-xl font-black tracking-tight uppercase mb-2">How to Vote</h3>
+                  <p className="text-sm opacity-50 leading-relaxed">
+                    Learn about the step-by-step voting process at the polling booth.
                   </p>
                 </motion.button>
               </div>
@@ -175,6 +196,35 @@ export default function Home() {
 
             {/* Candidate Explorer */}
             <CandidateExplorer />
+          </motion.div>
+        )}
+
+        {/* ──── VOTING PROCESS VIEW ──── */}
+        {view === 'voting-process' && (
+          <motion.div
+            key="voting-process"
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -30 }}
+            transition={{ duration: 0.4 }}
+            className="min-h-screen pb-20"
+          >
+            {/* Top Navigation Bar */}
+            <div className="max-w-7xl mx-auto px-4 pt-6 mb-6">
+              <button
+                onClick={() => setView('home')}
+                className="flex items-center gap-3 text-sm font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-blue-500/10 group-hover:border-blue-500/20 transition-all">
+                  <ArrowLeft size={18} />
+                </div>
+                Back to Home
+              </button>
+            </div>
+
+            <div className="px-4">
+              <VotingProcess />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

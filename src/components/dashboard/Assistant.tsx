@@ -45,6 +45,7 @@ export default function Assistant() {
       {/* Toggle Button */}
       <button 
         onClick={() => setIsOpen(true)}
+        aria-label="Open AI Assistant"
         className="fixed bottom-8 right-8 w-16 h-16 gradient-tn rounded-full shadow-glow flex items-center justify-center text-white z-50 hover:scale-110 active:scale-95 transition-all"
       >
         <MessageSquare size={28} />
@@ -69,7 +70,7 @@ export default function Assistant() {
                   <p className="text-[10px] font-bold opacity-60 uppercase tracking-widest mt-1">Election Expert</p>
                 </div>
               </div>
-              <button onClick={() => setIsOpen(false)} className="hover:bg-white/10 p-1 rounded-full transition-colors">
+              <button onClick={() => setIsOpen(false)} aria-label="Close Assistant" className="hover:bg-white/10 p-1 rounded-full transition-colors">
                 <X size={20} />
               </button>
             </div>
@@ -103,6 +104,7 @@ export default function Assistant() {
                 />
                 <button 
                   onClick={handleSend}
+                  aria-label="Send message"
                   className="absolute right-2 top-2 w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center text-white hover:brightness-110 active:scale-95 transition-all"
                 >
                   <Send size={18} />

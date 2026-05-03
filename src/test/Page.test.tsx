@@ -27,6 +27,10 @@ vi.mock('@/components/dashboard/ValidDocumentsModal', () => ({
   ),
 }));
 
+vi.mock('@/components/dashboard/VotingProcess', () => ({
+  default: () => <div data-testid="voting-process">VotingProcess</div>,
+}));
+
 vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -152,6 +156,35 @@ describe('Home Page', () => {
     if (candidatesCard) fireEvent.click(candidatesCard);
     
     expect(screen.getByTestId('candidate-explorer')).toBeInTheDocument();
+    vi.useRealTimers();
+  });
+
+  it('should navigate to voting-process from quick action card', async () => {
+    vi.useFakeTimers();
+    render(<Home />);
+    await React.act(async () => { vi.advanceTimersByTime(300); });
+
+    const votingHeading = screen.getByText('How to Vote', { selector: 'h3' });
+    const votingCard = votingHeading.closest('button');
+    if (votingCard) fireEvent.click(votingCard);
+    
+    expect(screen.getByTestId('voting-process')).toBeInTheDocument();
+    vi.useRealTimers();
+  });
+
+  it('should navigate back from voting-process to home', async () => {
+    vi.useFakeTimers();
+    render(<Home />);
+    await React.act(async () => { vi.advanceTimersByTime(300); });
+
+    const votingHeading = screen.getByText('How to Vote', { selector: 'h3' });
+    const votingCard = votingHeading.closest('button');
+    if (votingCard) fireEvent.click(votingCard);
+    
+    expect(screen.getByTestId('voting-process')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText(/Back to Home/i));
+    expect(screen.getByTestId('countdown-hero')).toBeInTheDocument();
     vi.useRealTimers();
   });
 });

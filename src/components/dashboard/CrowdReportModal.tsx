@@ -24,7 +24,7 @@ export default function CrowdReportModal({ isOpen, onClose }: CrowdReportModalPr
   };
 
   const handleSubmit = async () => {
-    if (level === null || !user) return;
+    if (level === null) return;
     setIsSubmitting(true);
     
     // Simulate Firebase/PubSub write

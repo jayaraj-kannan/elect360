@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import * as React from 'react';
 import { AuthProvider, useAuth } from '@/lib/authContext';
 import { onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
@@ -137,5 +137,32 @@ describe('AuthProvider', () => {
       expect(consoleSpy).toHaveBeenCalledWith('Error signing out', expect.any(Error));
     });
     consoleSpy.mockRestore();
+  });
+
+  it('should have default context values when used outside provider', async () => {
+    // To cover the default values in createContext
+    const DefaultContextTest = () => {
+      const { user, loading, signInWithGoogle, logout } = useAuth();
+      return (
+        <div>
+          <span data-testid="loading">{loading.toString()}</span>
+          <button data-testid="signin" onClick={signInWithGoogle}>Sign In</button>
+          <button data-testid="logout" onClick={logout}>Logout</button>
+        </div>
+      );
+    };
+
+    render(<DefaultContextTest />);
+    
+    expect(screen.getByTestId('loading')).toHaveTextContent('true');
+    
+    // Call the default empty functions
+    const signInBtn = screen.getByTestId('signin');
+    const logoutBtn = screen.getByTestId('logout');
+    
+    fireEvent.click(signInBtn);
+    fireEvent.click(logoutBtn);
+    
+    // Nothing should crash, defaults are async () => {}
   });
 });

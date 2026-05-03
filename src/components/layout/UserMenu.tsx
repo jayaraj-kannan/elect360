@@ -31,6 +31,8 @@ export default function UserMenu() {
     <div className="relative">
       <button 
         onClick={() => setIsOpen(!isOpen)}
+        aria-label="User menu"
+        aria-expanded={isOpen}
         className="flex items-center gap-2 p-1 pr-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group"
       >
         <div className="w-8 h-8 rounded-xl overflow-hidden border border-white/10 shadow-premium">

@@ -83,7 +83,7 @@ export default function Navbar() {
             </div>
             
             <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 ml-2">
-              <button className="p-2 text-white/40 hover:text-white transition-colors">
+              <button aria-label="Change Language" className="p-2 text-white/40 hover:text-white transition-colors">
                 <Languages size={18} />
               </button>
             </div>
@@ -95,6 +95,7 @@ export default function Navbar() {
           {/* Mobile Menu Toggle */}
           <button 
             data-testid="mobile-menu-toggle"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden p-3 rounded-2xl bg-white/5 border border-white/10 text-white"
           >
