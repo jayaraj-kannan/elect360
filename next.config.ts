@@ -9,7 +9,11 @@ const withSerwist = withSerwistInit({
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  turbopack: {},
+  turbopack: {
+    // Explicitly set the workspace root to prevent Turbopack from scanning
+    // up to the home directory if a stray package-lock.json exists there.
+    root: process.cwd(),
+  },
   // other options
 };
 

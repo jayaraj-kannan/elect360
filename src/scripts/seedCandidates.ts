@@ -1,7 +1,7 @@
 import { db } from "../lib/firebase";
 import { doc, setDoc } from "firebase/firestore";
 
-const candidates: Record<string, unknown>[] = [
+const candidates: any[] = [
   {
     name: "Dr. Anbu Selvan",
     party: "DMK",

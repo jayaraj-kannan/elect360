@@ -5,6 +5,7 @@ import { Users, MapPin, Loader2, ChevronDown, ShieldAlert, TrendingUp, FileText 
 import { motion, AnimatePresence } from 'framer-motion';
 import { getDistrictsByState, getConstituenciesByDistrict } from '@/lib/boothService';
 import { getCandidatesByConstituencyName, Candidate } from '@/lib/candidateService';
+import CandidateModal from './CandidateModal';
 
 export default function CandidateExplorer() {
   const [districts, setDistricts] = useState<{id: string, name: string}[]>([]);
@@ -14,6 +15,7 @@ export default function CandidateExplorer() {
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedConstituency, setSelectedConstituency] = useState('');
   const [selectedConstituencyName, setSelectedConstituencyName] = useState('');
+  const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
 
   const [loading, setLoading] = useState({
     districts: true,
@@ -196,76 +198,89 @@ export default function CandidateExplorer() {
             ) : candidates.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {candidates.map((c, idx) => (
-                  <motion.div
-                    key={c.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.1 }}
-                    whileHover={{ y: -4 }}
-                    className="glass rounded-[32px] border-white/10 p-6 md:p-8 shadow-premium flex flex-col md:flex-row gap-6 overflow-hidden relative group"
-                  >
-                    <div className="absolute top-0 right-0 w-32 h-32 blur-3xl opacity-10 group-hover:opacity-20 bg-purple-500 transition-opacity" />
+                    <motion.div
+                      key={c.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      whileHover={{ y: -4 }}
+                      onClick={() => setSelectedCandidate(c)}
+                      className="glass rounded-[32px] border-white/10 p-6 md:p-8 shadow-premium flex flex-col md:flex-row gap-6 overflow-hidden relative group cursor-pointer"
+                    >
+                      <div className="absolute top-0 right-0 w-32 h-32 blur-3xl opacity-10 group-hover:opacity-20 bg-purple-500 transition-opacity" />
 
-                    <div className="flex-shrink-0 flex justify-center md:justify-start">
-                      <div className="relative w-24 h-24 md:w-36 md:h-36 rounded-2xl overflow-hidden border-2 border-white/10 group-hover:border-purple-500/50 transition-colors">
-                        <img src={c.image} alt={c.name} className="w-full h-full object-cover" />
-                        <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm p-1.5 text-center text-[10px] font-black tracking-widest text-white">
-                          {c.party}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex-grow space-y-3">
-                      <div>
-                        <div className="flex flex-wrap gap-1.5 mb-2">
-                          {c.tags.map(t => (
-                            <span key={t} className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-wider text-white/60">
-                              {t}
-                            </span>
-                          ))}
-                        </div>
-                        <h3 className="text-xl font-black tracking-tight">{c.name}</h3>
-                        <p className="text-xs font-bold text-purple-400 italic opacity-80">{selectedConstituencyName}</p>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/5">
-                        <div className="flex items-center gap-2">
-                          <TrendingUp size={14} className="text-white/30" />
-                          <div>
-                            <p className="text-[9px] font-black opacity-40 uppercase tracking-widest">Assets</p>
-                            <p className="font-bold text-xs">{c.wealth}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <ShieldAlert size={14} className={c.criminalCases > 0 ? "text-red-400" : "text-green-400"} />
-                          <div>
-                            <p className="text-[9px] font-black opacity-40 uppercase tracking-widest">Cases</p>
-                            <p className={`font-bold text-xs ${c.criminalCases > 0 ? "text-red-400" : "text-green-400"}`}>
-                              {c.criminalCases === 0 ? "None" : `${c.criminalCases} Filed`}
-                            </p>
+                      <div className="flex-shrink-0 flex justify-center md:justify-start">
+                        <div className="relative w-24 h-24 md:w-36 md:h-36 rounded-2xl overflow-hidden border-2 border-white/10 group-hover:border-purple-500/50 transition-colors">
+                          {c.image ? (
+                            <img src={c.image} alt={c.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-white/5">
+                              <span className="text-3xl font-black opacity-30">{c.name.charAt(0)}</span>
+                            </div>
+                          )}
+                          <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm p-1.5 text-center text-[10px] font-black tracking-widest text-white">
+                            {c.party}
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 pt-1 opacity-50 hover:opacity-100 transition-opacity cursor-pointer">
-                        <FileText size={14} />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">Education: {c.education}</span>
+                      <div className="flex-grow space-y-3">
+                        <div>
+                          <div className="flex flex-wrap gap-1.5 mb-2">
+                            {c.tags.map(t => (
+                              <span key={t} className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-black uppercase tracking-wider text-white/60">
+                                {t}
+                              </span>
+                            ))}
+                          </div>
+                          <h3 className="text-xl font-black tracking-tight">{c.name}</h3>
+                          <p className="text-xs font-bold text-purple-400 italic opacity-80">{selectedConstituencyName}</p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/5">
+                          <div className="flex items-center gap-2">
+                            <TrendingUp size={14} className="text-white/30" />
+                            <div>
+                              <p className="text-[9px] font-black opacity-40 uppercase tracking-widest">Assets</p>
+                              <p className="font-bold text-xs">{c.wealth}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <ShieldAlert size={14} className={c.criminalCases > 0 ? "text-red-400" : "text-green-400"} />
+                            <div>
+                              <p className="text-[9px] font-black opacity-40 uppercase tracking-widest">Cases</p>
+                              <p className={`font-bold text-xs ${c.criminalCases > 0 ? "text-red-400" : "text-green-400"}`}>
+                                {c.criminalCases === 0 ? "None" : `${c.criminalCases} Filed`}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-1 opacity-50 hover:opacity-100 transition-opacity cursor-pointer">
+                          <FileText size={14} />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">Education: {c.education}</span>
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16 glass rounded-[32px] border-white/10">
-                <Users size={40} className="mx-auto mb-4 opacity-20" />
-                <p className="font-bold opacity-40 uppercase tracking-widest text-sm italic">
-                  No candidate data found for {selectedConstituencyName} yet.
-                </p>
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16 glass rounded-[32px] border-white/10">
+                  <Users size={40} className="mx-auto mb-4 opacity-20" />
+                  <p className="font-bold opacity-40 uppercase tracking-widest text-sm italic">
+                    No candidate data found for {selectedConstituencyName} yet.
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <CandidateModal 
+          isOpen={!!selectedCandidate} 
+          onClose={() => setSelectedCandidate(null)} 
+          candidate={selectedCandidate} 
+        />
+      </div>
+    );
 }

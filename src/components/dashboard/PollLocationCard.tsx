@@ -67,7 +67,14 @@ export default function PollLocationCard() {
         
         {view !== 'initial' && view !== 'locating' && (
           <button 
-            onClick={() => setView(view === 'result' ? 'initial' : 'search-options')}
+            onClick={() => {
+              if (view === 'result') {
+                setView('initial');
+                setSelectedWard(null);
+              } else {
+                setView('search-options');
+              }
+            }}
             className="p-2 hover:bg-white/5 rounded-full transition-colors opacity-40 hover:opacity-100"
           >
             <ChevronLeft size={20} />

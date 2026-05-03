@@ -25,6 +25,7 @@ const languages = [
 ];
 
 import { ThemeToggle } from './ThemeToggle';
+import UserMenu from './UserMenu';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -61,50 +62,43 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Desktop Controls */}
-        <div className="hidden md:flex items-center gap-6">
-          {/* State Selector */}
-          <div className="flex items-center gap-2 bg-foreground/5 p-1 rounded-full border border-foreground/10">
-            {states.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => setSelectedState(s.id)}
-                className={cn(
-                  "px-4 py-1.5 rounded-full text-xs font-bold transition-all",
-                  selectedState === s.id 
-                    ? "bg-foreground text-background shadow-lg" 
-                    : "hover:bg-foreground/10 opacity-70 hover:opacity-100"
-                )}
-              >
-                {s.id}
+        {/* Actions */}
+        <div className="flex items-center gap-2 md:gap-4">
+          <div className="hidden md:flex items-center gap-2">
+            <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
+              {states.map((state) => (
+                <button
+                  key={state.id}
+                  onClick={() => setSelectedState(state.id)}
+                  className={cn(
+                    "px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                    selectedState === state.id 
+                      ? "bg-white text-black shadow-premium" 
+                      : "text-white/40 hover:text-white/100"
+                  )}
+                >
+                  {state.id}
+                </button>
+              ))}
+            </div>
+            
+            <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10 ml-2">
+              <button className="p-2 text-white/40 hover:text-white transition-colors">
+                <Languages size={18} />
               </button>
-            ))}
+            </div>
           </div>
 
-          <div className="h-6 w-px bg-foreground/10" />
-
-          {/* Language Selector */}
-          <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-foreground/5 transition-colors group">
-            <Languages size={18} className="group-hover:rotate-12 transition-transform text-foreground" />
-            <span className="text-sm font-semibold text-foreground">தமிழ்</span>
-          </button>
-
           <ThemeToggle />
-
-          <button className="bg-brand-primary text-white px-6 py-2 rounded-xl font-bold text-sm shadow-glow hover:brightness-110 transition-all active:scale-95">
-            FIND BOOTH
-          </button>
-        </div>
-
-        {/* Mobile Toggle */}
-        <div className="md:hidden flex items-center gap-2">
-          <ThemeToggle />
+          <UserMenu />
+          
+          {/* Mobile Menu Toggle */}
           <button 
             data-testid="mobile-menu-toggle"
-            className="text-foreground" 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden p-3 rounded-2xl bg-white/5 border border-white/10 text-white"
           >
-            {isMenuOpen ? <X /> : <Menu />}
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>

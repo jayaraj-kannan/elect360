@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { ShieldAlert, TrendingUp, FileText, ChevronRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getCandidatesByConstituencyName, Candidate } from '@/lib/candidateService';
+import CandidateModal from './CandidateModal';
 
 interface CandidateShowcaseProps {
   constituencyId?: string;
@@ -13,6 +14,7 @@ interface CandidateShowcaseProps {
 export default function CandidateShowcase({ constituencyName }: CandidateShowcaseProps) {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
 
   useEffect(() => {
     if (!constituencyName) return;
@@ -40,7 +42,7 @@ export default function CandidateShowcase({ constituencyName }: CandidateShowcas
         <div>
           <h2 className="text-3xl font-black tracking-tight uppercase">Constituency Candidates</h2>
           <p className="text-sm font-bold opacity-60 uppercase tracking-widest mt-1">
-            {constituencyName || "Selected Constituency"} - Phase 1
+            {constituencyName} - Phase 1
           </p>
         </div>
         {candidates.length > 0 && (
@@ -61,14 +63,21 @@ export default function CandidateShowcase({ constituencyName }: CandidateShowcas
             <motion.div 
               key={c.id}
               whileHover={{ y: -5 }}
-              className="glass rounded-[40px] border-white/10 p-6 md:p-8 shadow-premium flex flex-col md:flex-row gap-6 md:gap-8 overflow-hidden relative group"
+              onClick={() => setSelectedCandidate(c)}
+              className="glass rounded-[40px] border-white/10 p-6 md:p-8 shadow-premium flex flex-col md:flex-row gap-6 md:gap-8 overflow-hidden relative group cursor-pointer"
             >
               {/* Background Decorative */}
               <div className="absolute top-0 right-0 w-32 h-32 blur-3xl opacity-10 transition-opacity group-hover:opacity-20 bg-brand-primary" />
 
               <div className="flex-shrink-0 flex justify-center md:justify-start">
                  <div className="relative w-28 h-28 md:w-40 md:h-40 rounded-3xl overflow-hidden border-2 border-white/10 group-hover:border-brand-primary/50 transition-colors">
-                    <img src={c.image} alt={c.name} className="w-full h-full object-cover" />
+                    {c.image ? (
+                      <img src={c.image} alt={c.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-white/5">
+                        <span className="text-3xl font-black opacity-30">{c.name.charAt(0)}</span>
+                      </div>
+                    )}
                     <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm p-2 text-center text-[10px] font-black tracking-widest text-white">
                       {c.party}
                     </div>
@@ -130,6 +139,12 @@ export default function CandidateShowcase({ constituencyName }: CandidateShowcas
           <p className="font-bold opacity-40 uppercase tracking-widest text-sm italic">No candidate data found for this constituency yet.</p>
         </div>
       )}
+
+      <CandidateModal 
+        isOpen={!!selectedCandidate} 
+        onClose={() => setSelectedCandidate(null)} 
+        candidate={selectedCandidate} 
+      />
     </section>
   );
 }

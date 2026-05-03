@@ -101,4 +101,26 @@ describe('CountdownHero', () => {
     // Minutes and seconds should also be 59
     expect(screen.getAllByText('59').length).toBeGreaterThanOrEqual(2);
   });
+
+  it('should stop decrementing when countdown reaches zero', async () => {
+    render(<CountdownHero {...mockProps} />);
+
+    // Initial: 2d 14h 22m 54s. Total seconds = 2*86400 + 14*3600 + 22*60 + 54 = 224574
+    // Advance all the way to zero
+    await React.act(async () => {
+      vi.advanceTimersByTime(224574 * 1000);
+    });
+
+    // All should be at 00 now
+    const zeros = screen.getAllByText('00');
+    expect(zeros.length).toBe(4);
+
+    // One more tick shouldn't change anything (return prev branch)
+    await React.act(async () => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    const stillZeros = screen.getAllByText('00');
+    expect(stillZeros.length).toBe(4);
+  });
 });

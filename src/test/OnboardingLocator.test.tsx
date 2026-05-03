@@ -173,4 +173,54 @@ describe('OnboardingLocator', () => {
       expect(screen.getByText(/Failed to locate booth/i)).toBeInTheDocument();
     });
   });
+
+  it('should find the nearest booth among multiple booths', async () => {
+    // Return multiple booths to trigger distance comparison
+    mockSearchBooths.mockResolvedValueOnce([
+      {
+        id: 'b1',
+        name: 'Far Booth',
+        coords: { lat: 14.0, lng: 81.0 }, // Far away
+        wardId: 'w1',
+        wardName: 'Ward 1',
+        stateId: 'TN'
+      },
+      {
+        id: 'b2',
+        name: 'Near Booth',
+        coords: { lat: 13.001, lng: 80.001 }, // Very close
+        wardId: 'w2',
+        wardName: 'Ward 2',
+        stateId: 'TN'
+      },
+      {
+        id: 'b3',
+        name: 'Another Far Booth',
+        coords: { lat: 15.0, lng: 82.0 }, // Far away to hit dist < minDistance = false
+        wardId: 'w3',
+        wardName: 'Ward 3',
+        stateId: 'TN'
+      }
+    ]);
+
+    const onComplete = vi.fn();
+    (global.navigator.geolocation.getCurrentPosition as any).mockImplementation((success: any) => {
+      // User is at 13.0, 80.0
+      success({ coords: { latitude: 13.0, longitude: 80.0 } });
+    });
+
+    render(<OnboardingLocator onComplete={onComplete} />);
+    fireEvent.click(screen.getByText(/Detect Location/i));
+
+    await waitFor(() => {
+      expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({
+        id: 'w2',
+        name: 'Ward 2',
+        booth: expect.objectContaining({
+          id: 'b2',
+          name: 'Near Booth'
+        })
+      }));
+    }, { timeout: 2000 });
+  });
 });

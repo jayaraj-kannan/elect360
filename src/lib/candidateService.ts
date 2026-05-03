@@ -10,6 +10,10 @@ export interface Candidate {
   criminalCases: number;
   tags: string[];
   image: string;
+  storagePath?: string;
+  liabilities?: string;
+  profession?: string;
+  age?: number;
 }
 
 const ELECTION_ROOT = "tn_election_2026";
@@ -60,7 +64,11 @@ export async function getCandidatesByConstituencyName(constituencyName: string):
         wealth: data.total_assets || "N/A", // Map from external schema
         criminalCases: data.criminal_cases || 0, // Map from external schema
         tags: tags.length > 0 ? tags : data.tags || [],
-        image: data.image || "https://images.unsplash.com/photo-1540562514872-552763702958?auto=format&fit=crop&q=80&w=200&h=200"
+        image: data.image_url || data.image || "",
+        storagePath: data.storage_path || "",
+        liabilities: data.liabilities || "N/A",
+        profession: data.profession || "N/A",
+        age: data.age ? parseInt(data.age, 10) : undefined
       });
     });
     

@@ -31,7 +31,7 @@ describe('Navbar', () => {
     render(<Navbar />);
     const klButton = screen.getByText('KL');
     fireEvent.click(klButton);
-    expect(klButton).toHaveClass('bg-foreground');
+    expect(klButton).toHaveClass('bg-white');
   });
 
   it('should toggle mobile menu when menu button is clicked', () => {
@@ -61,5 +61,15 @@ describe('Navbar', () => {
     
     // Menu should be closed
     expect(screen.queryByText('Kerala')).not.toBeInTheDocument();
+  });
+
+  it('should apply scrolled styles when page is scrolled', () => {
+    render(<Navbar />);
+    // Simulate scrolling past 10px
+    Object.defineProperty(window, 'scrollY', { value: 50, writable: true });
+    fireEvent.scroll(window);
+
+    const nav = document.querySelector('nav');
+    expect(nav?.className).toContain('backdrop-blur-md');
   });
 });

@@ -83,7 +83,7 @@ describe('PollStatusCard', () => {
     fireEvent.click(screen.getByText('HIGH'));
 
     // Submit
-    fireEvent.click(screen.getByText(/SUBMIT REPORT/i));
+    fireEvent.click(screen.getByText(/CONFIRM REPORT/i));
 
     // Wait for simulated write
     await React.act(async () => {

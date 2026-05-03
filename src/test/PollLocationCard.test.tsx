@@ -33,6 +33,21 @@ vi.mock('@/components/dashboard/BoothSearchForm', () => ({
       })}>
         Select Ward
       </button>
+      <button onClick={() => onSelect({
+        id: 'w2',
+        name: 'Ward No Info',
+        stateId: 'TN',
+        booth: {
+          id: 'b2',
+          name: 'Booth No Info',
+          address: '456 Secondary St',
+          coords: { lat: 13.1, lng: 80.1 },
+          distance: '',
+          travelTime: ''
+        }
+      })}>
+        Select Ward No Info
+      </button>
     </div>
   ),
 }));
@@ -122,7 +137,7 @@ describe('PollLocationCard', () => {
     render(<PollLocationCard />);
     fireEvent.click(screen.getByText(/START SEARCH/i));
     fireEvent.click(screen.getByText(/Select Manually/i));
-    fireEvent.click(screen.getByText(/Select Ward/i));
+    fireEvent.click(screen.getByText("Select Ward"));
 
     expect(screen.getByText(/FOUND BOOTH/i)).toBeInTheDocument();
     expect(screen.getByText('Test Booth')).toBeInTheDocument();
@@ -167,8 +182,51 @@ describe('PollLocationCard', () => {
     render(<PollLocationCard />);
     fireEvent.click(screen.getByText(/START SEARCH/i));
     fireEvent.click(screen.getByText(/Select Manually/i));
-    fireEvent.click(screen.getByText(/Select Ward/i));
+    fireEvent.click(screen.getByText("Select Ward"));
 
     expect(screen.getByText(/Verified ECI/i)).toBeInTheDocument();
+  });
+
+  it('should go back from result to initial via back button', async () => {
+    render(<PollLocationCard />);
+    fireEvent.click(screen.getByText(/START SEARCH/i));
+    fireEvent.click(screen.getByText(/Select Manually/i));
+    fireEvent.click(screen.getByText("Select Ward"));
+
+    expect(screen.getByText(/FOUND BOOTH/i)).toBeInTheDocument();
+
+    // Click the back button (ChevronLeft) — from result it should go to 'initial'
+    const buttons = screen.getAllByRole('button');
+    const backBtn = buttons.find(b => b.querySelector('svg') && b.classList.contains('opacity-40'));
+    if (backBtn) fireEvent.click(backBtn);
+
+    // Should be back at initial state
+    expect(screen.getByText(/Where is your booth/i)).toBeInTheDocument();
+  });
+
+  it('should go from manual-form back to search-options via back button', () => {
+    render(<PollLocationCard />);
+    fireEvent.click(screen.getByText(/START SEARCH/i));
+    fireEvent.click(screen.getByText(/Select Manually/i));
+
+    expect(screen.getByTestId('booth-search-form')).toBeInTheDocument();
+
+    // Click back — from manual-form should go to search-options
+    const buttons = screen.getAllByRole('button');
+    const backBtn = buttons.find(b => b.classList.contains('opacity-40'));
+    if (backBtn) fireEvent.click(backBtn);
+
+    expect(screen.getByText(/Use Live Location/i)).toBeInTheDocument();
+  });
+
+  it('should show fallback distance and travelTime when missing', () => {
+    render(<PollLocationCard />);
+    fireEvent.click(screen.getByText(/START SEARCH/i));
+    fireEvent.click(screen.getByText(/Select Manually/i));
+    fireEvent.click(screen.getByText(/Select Ward No Info/i));
+
+    expect(screen.getByText(/FOUND BOOTH/i)).toBeInTheDocument();
+    expect(screen.getByText('~ 0.5 KM')).toBeInTheDocument();
+    expect(screen.getByText('3 MINS')).toBeInTheDocument();
   });
 });

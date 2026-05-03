@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { AlertTriangle, CheckCircle2, X } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, X, LogIn, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/lib/authContext';
 
 interface CrowdReportModalProps {
   isOpen: boolean;
@@ -10,12 +11,20 @@ interface CrowdReportModalProps {
 }
 
 export default function CrowdReportModal({ isOpen, onClose }: CrowdReportModalProps) {
+  const { user, signInWithGoogle } = useAuth();
   const [level, setLevel] = useState<number | null>(null);
+  const [isSigningIn, setIsSigningIn] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  const handleSignIn = async () => {
+    setIsSigningIn(true);
+    await signInWithGoogle();
+    setIsSigningIn(false);
+  };
+
   const handleSubmit = async () => {
-    if (level === null) return;
+    if (level === null || !user) return;
     setIsSubmitting(true);
     
     // Simulate Firebase/PubSub write
@@ -99,21 +108,30 @@ export default function CrowdReportModal({ isOpen, onClose }: CrowdReportModalPr
                   <div className="bg-brand-secondary/10 p-4 rounded-2xl border border-brand-secondary/20 flex gap-3">
                     <AlertTriangle size={20} className="text-brand-secondary flex-shrink-0" />
                     <p className="text-xs font-bold text-brand-secondary leading-relaxed uppercase">
-                      Your report will be anonymous and aggregated to protect privacy.
+                      False reporting leads to temporary platform bans. Please only report if you are at the booth.
                     </p>
                   </div>
 
-                  <button 
-                    disabled={level === null || isSubmitting}
-                    onClick={handleSubmit}
-                    className={`w-full py-5 rounded-2xl font-black text-sm transition-all uppercase tracking-widest shadow-2lg ${
-                      level === null || isSubmitting
-                        ? 'bg-white/10 text-white/20 cursor-not-allowed'
-                        : 'bg-white text-black hover:scale-[1.02] active:scale-95'
-                    }`}
-                  >
-                    {isSubmitting ? 'SUBMITTING...' : 'SUBMIT REPORT'}
-                  </button>
+                  {!user ? (
+                    <button
+                      onClick={handleSignIn}
+                      disabled={isSigningIn}
+                      className="w-full py-5 rounded-2xl bg-brand-primary text-white font-black text-sm transition-all uppercase tracking-widest shadow-glow flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                    >
+                      {isSigningIn ? <Loader2 className="animate-spin" size={18} /> : <LogIn size={18} />}
+                      SIGN IN TO REPORT
+                    </button>
+                  ) : (
+                    <button
+                      disabled={level === null || isSubmitting}
+                      onClick={handleSubmit}
+                      className={`w-full py-5 rounded-2xl font-black text-sm transition-all uppercase tracking-widest shadow-premium flex items-center justify-center gap-3 ${
+                        level === null ? 'bg-white/5 text-white/20' : 'bg-white text-black hover:scale-[1.02] active:scale-95'
+                      }`}
+                    >
+                      {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : 'CONFIRM REPORT'}
+                    </button>
+                  )}
                 </>
               ) : (
                 <div className="py-12 flex flex-col items-center text-center">

@@ -98,7 +98,7 @@ describe('candidateService', () => {
     expect(results[0].education).toBe('N/A');
     expect(results[0].wealth).toBe('N/A');
     expect(results[0].criminalCases).toBe(0);
-    expect(results[0].image).toContain('unsplash');
+    expect(results[0].image).toBe('');
   });
 
   it('should use existing tags when no computed tags available', async () => {

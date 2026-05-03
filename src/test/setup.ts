@@ -18,6 +18,30 @@ vi.mock('firebase/firestore', () => ({
 
 vi.mock('firebase/auth', () => ({
   getAuth: vi.fn(),
+  onAuthStateChanged: vi.fn((auth, callback) => {
+    // Default to logged out for the firebase listener itself
+    callback(null);
+    return vi.fn();
+  }),
+  GoogleAuthProvider: vi.fn(),
+  signInWithPopup: vi.fn(),
+  signOut: vi.fn(),
+}));
+
+// Mock Auth Context
+vi.mock('@/lib/authContext', () => ({
+  useAuth: vi.fn(() => ({
+    user: { 
+      uid: 'test-uid', 
+      displayName: 'Test User', 
+      email: 'test@example.com',
+      photoURL: 'https://example.com/photo.jpg'
+    },
+    loading: false,
+    signInWithGoogle: vi.fn(),
+    logout: vi.fn(),
+  })),
+  AuthProvider: ({ children }: any) => children,
 }));
 
 // Mock localStorage

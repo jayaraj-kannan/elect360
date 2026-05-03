@@ -11,7 +11,7 @@ import { electionData } from "../data/electionData";
 
 const ELECTION_ROOT = "tn_election_2026";
 
-const candidatesData: Record<string, unknown[]> = {
+const candidatesData: Record<string, any[]> = {
   "mylapore": [
     {
       name: "Dr. Anbu Selvan",

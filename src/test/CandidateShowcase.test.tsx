@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import CandidateShowcase from '@/components/dashboard/CandidateShowcase';
 import { getCandidatesByConstituencyName } from '@/lib/candidateService';
 
@@ -15,7 +15,9 @@ vi.mock('framer-motion', async () => {
     ...actual,
     motion: {
       ...actual.motion,
-      div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+      div: ({ children, onClick, className, ...props }: any) => (
+        <div onClick={onClick} className={className} data-testid="motion-div" {...props}>{children}</div>
+      ),
     },
     AnimatePresence: ({ children }: any) => <>{children}</>,
   };
@@ -82,4 +84,89 @@ describe('CandidateShowcase', () => {
     
     consoleSpy.mockRestore();
   });
+  it('should render candidate with criminal cases and custom tags', async () => {
+    const mockCandidates = [
+      {
+        id: '1',
+        name: 'Bad Candidate',
+        party: 'XYZ',
+        wealth: '100 Cr',
+        criminalCases: 5,
+        tags: [],
+        image: '/test.jpg'
+      }
+    ];
+    vi.mocked(getCandidatesByConstituencyName).mockResolvedValueOnce(mockCandidates);
+
+    render(<CandidateShowcase constituencyName="Mylapore" />);
+    
+    await waitFor(() => {
+      expect(screen.getByText('Bad Candidate')).toBeInTheDocument();
+      expect(screen.getByText('5 Filed')).toHaveClass('text-red-400');
+      // Should show fallback tag
+      expect(screen.getByText('Candidate')).toBeInTheDocument();
+    });
+  });
+
+  it('should render initial letter fallback when candidate has no image', async () => {
+    const mockCandidates = [
+      {
+        id: '1',
+        name: 'No Photo Candidate',
+        party: 'IND',
+        wealth: '5 Cr',
+        criminalCases: 0,
+        image: '',
+        tags: ['New']
+      }
+    ];
+    vi.mocked(getCandidatesByConstituencyName).mockResolvedValueOnce(mockCandidates as any);
+
+    render(<CandidateShowcase constituencyName="Mylapore" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('No Photo Candidate')).toBeInTheDocument();
+      // Should render the first letter 'N' as fallback
+      expect(screen.getByText('N')).toBeInTheDocument();
+    });
+  });
+
+  it('should open modal when candidate card is clicked', async () => {
+    const mockCandidates = [
+      {
+        id: '1',
+        name: 'Modal Candidate',
+        party: 'Party A',
+        wealth: '10 Cr',
+        criminalCases: 0,
+        image: '/img1.jpg',
+        tags: ['Experienced']
+      }
+    ];
+    vi.mocked(getCandidatesByConstituencyName).mockResolvedValue(mockCandidates as any);
+    
+    render(<CandidateShowcase constituencyName="Mylapore" />);
+    
+    await waitFor(() => {
+      expect(screen.getByText('Modal Candidate')).toBeInTheDocument();
+    });
+
+    const card = screen.getByText('Modal Candidate').closest('div.glass');
+    if (card) fireEvent.click(card);
+
+    // The CandidateModal text should now be visible
+    await waitFor(() => {
+      expect(screen.getAllByText('Modal Candidate').length).toBeGreaterThan(1); // One in card, one in modal
+    });
+
+    // Close the modal
+    const buttons = screen.getAllByRole('button');
+    // The close button is usually the second to last button (before 'Download Manifesto' button)
+    fireEvent.click(buttons[buttons.length - 2]);
+
+    await waitFor(() => {
+      expect(screen.queryAllByText('Modal Candidate').length).toBe(1); // Only the card should remain
+    });
+  });
+
 });
